@@ -1,0 +1,43 @@
+{
+  "root": true,
+  "env": {
+      "node": true,
+      "commonjs": true,
+      "es6": true
+  },
+  "globals": {
+      "$": false
+  },
+  "extends": [
+      "@tencent/eslint-config-tencent"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 2018,
+      "parser": "@typescript-eslint/parser",
+      "ecmaFeatures": {
+          "legacyDecorators": true
+      }
+  },
+  "plugins": [
+      "@typescript-eslint"
+  ],
+  "rules": {
+      "no-param-reassign": ["off"]
+  },
+  "overrides": [{
+      "files": ["*.ts"],
+      "extends": [
+          "@tencent/eslint-config-tencent/ts"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "rules": {
+          "no-unused-vars": ["off"],
+          "@typescript-eslint/no-unused-vars": ["error"]
+      },
+      "parserOptions": {
+          "project": "./tsconfig.json"
+      }
+  }]
+}

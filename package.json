@@ -1,0 +1,30 @@
+{
+  "name": "supernova",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc && cross-env NODE_ENV=development node dist/index.js",
+    "build": "tsc",
+    "start": "cross-env NODE_ENV=production node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tencent/rainbow-node-sdk": "^0.2.51",
+    "canvas": "^2.9.1",
+    "cross-env": "^7.0.3",
+    "moment": "^2.29.3",
+    "puppeteer": "^13.4.0",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "@tencent/eslint-config-tencent": "^0.16.0",
+    "@types/request": "^2.48.8",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-typescript": "^0.14.0",
+    "typescript": "^4.6.3"
+  }
+}

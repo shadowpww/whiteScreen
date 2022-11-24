@@ -1,0 +1,78 @@
+# 构建Debian基础镜像
+.buildDebian: &buildDebian
+  # 登录docker
+  - name: docker login for image
+    envFrom: https://git.code.oa.com/shiluluo/accounts/blob/master/csighub.txt
+    script: docker login -u $DOCKER_USER -p $DOCKER_PWD csighub.tencentyun.com
+
+  # 创建镜像
+  - name: docker build
+    script: docker build --network=host --ulimit nofile=1048576:1048576 -f Dockerfile.Debian -t csighub.tencentyun.com/moggyteam/debian-node .
+
+  # 推送到仓库
+  - name: docker push for csighub.tencentyun.com/moggyteam/debian-node
+    script:
+      - docker push csighub.tencentyun.com/moggyteam/debian-node
+
+# 创建镜像
+.createDockerImage: &createDockerImage
+  # 从七彩石获取配置
+  - name: 七彩石Secret配置下载到文件
+    envFrom: https://git.code.oa.com/alvincao/secrets/blob/master/rainbow-account
+    image: csighub.tencentyun.com/spencezhang/rainbow-oci-plugin
+    settings:
+      appID: e21af2b2-3687-4ac7-84b2-f3b342c1ad54 # 必填，项目ID
+      group: supernova.config-files               # 必填，分组信息
+      groupConfigType: file                       # 可选，分组数据格式：kv或file，默认为 kv
+      type: group                                 # 必填，类型：key或group，key表示下载单个配置，group表示下载分组下所有配置
+      userID: ${RAINBOW_USER_ID}                  # （可选参数，配置了需要请求签名时必填），用户ID，注意不是用户名，获取方式在七彩石管理端项目信息也增加自定义用户
+      secretKey: ${RAINBOW_SECRET_KEY}            # （可选参数，配置了需要请求签名时必填），密钥
+      target: ./Rainbow
+
+  # 创建镜像tag
+  - name: create docker tag
+    script: echo -n "$(echo -n $ORANGE_BRANCH | cut -f1 -d '/')"-"$ORANGE_BUILD_USER"-"$ORANGE_COMMIT_SHORT"-$(date "+%Y%m%d.%H.%M")
+    envExport:
+      info: DOCKER_TAG
+    chat: "镜像tag:$DOCKER_TAG"
+
+  # 登录docker
+  - name: docker login for image
+    envFrom: https://git.code.oa.com/shiluluo/accounts/blob/master/csighub.txt
+    script: docker login -u $DOCKER_USER -p $DOCKER_PWD csighub.tencentyun.com
+
+  # 创建镜像
+  - name: docker build
+    script: docker build --network=host --ulimit nofile=1048576:1048576 -t csighub.tencentyun.com/moggyteam/supernova:${DOCKER_TAG} ./
+    chat: "镜像名称:$DOCKER_TAG"
+
+  # 推送到仓库
+  - name: docker push for csighub.tencentyun.com/moggyteam/supernova
+    script:
+      - docker push csighub.tencentyun.com/moggyteam/supernova:${DOCKER_TAG}
+
+# 特性开发分支
+"{feature,bugfix,hotfix}/*":
+  push:
+    - services:
+        - docker
+      runner:
+        network: devnet
+      wework:
+        title: supernova分支构建
+      stages: 
+        # - *buildDebian
+        - *createDockerImage
+
+master:
+  push:
+    - services:
+      - docker
+      runner:
+        network: devnet
+      wework:
+        title: supernova主干构建
+      stages: 
+        # - *buildDebian
+        - *createDockerImage
+

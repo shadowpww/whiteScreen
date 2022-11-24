@@ -1,0 +1,4 @@
+node_modules
+__screenshot
+dist
+*.txt
